@@ -5,9 +5,27 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  background-color: aliceblue;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+
+.custom-table-head{
+  height: 50px;
+  
+}
+
+.custom-table-head th{
+  border-style: none !important;
+  padding: 0 0 0 2rem !important;
+}
+
+tbody td{
+  padding: 0 2rem !important;
+  vertical-align: middle;
 }
