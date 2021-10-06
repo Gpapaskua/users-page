@@ -1,12 +1,19 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router';
 
-/**Helpers */
-import { positions } from '../helpers/formHelpers';
+/**API methods */
+import { usersAPI } from '../api/usersAPI';
+
+
 
 const Filter = ({filterItems, setFilterItems, setPage}) => {
 
-    const positionKeys = Object.keys(positions);
+    const [positions, setPositions] = useState(null);
+    const [contractTypes, setContractTypes] = useState(null);
+    const [seniorities, setSeniorities] = useState(null);
+    const [jobTypes, setJobTypes] = useState(null);
+
+    
     const history = useHistory();
 
     const onFilterItemsChange = e => {
@@ -23,11 +30,31 @@ const Filter = ({filterItems, setFilterItems, setPage}) => {
     const handleFilterSubmit = e => {
 
         e.preventDefault();
-        const url = `?page=${1}${filterItems.perPage.length > 0 ? `&perPage=${filterItems.perPage}` : ''}${filterItems.name.length > 0 ? `&name=${filterItems.name}` : ''}${filterItems.email.length > 0 ? `&email=${filterItems.email}` : ''}${filterItems.doc_id.length > 0 ? `&doc_id=${filterItems.doc_id}` : ''}${filterItems.phone.length > 0 ? `&phone=${filterItems.phone}` : ''}${filterItems.adress.length > 0 ? `&adress=${filterItems.adress}` : ''}${filterItems.id.length > 0 ? `&id=${filterItems.id}` : ''}${filterItems.status.length > 0 ? `&status=${filterItems.status}` : ''}${filterItems.contract_type_id.length > 0 ? `&contract_type_id=${filterItems.contract_type_id}` : ''}${filterItems.job_type_id.length > 0 ? `&job_type_id=${filterItems.job_type_id}` : ''}${filterItems.seniority_id.length > 0 ? `&seniority_id=${filterItems.seniority_id}` : ''}${filterItems.position_id.length > 0 ? `&position_id=${filterItems.position_id}` : ''}`
+        let url = `?page=1`
+        
+        Object.keys(filterItems).map(key => url+=`&${key}=${filterItems[key]}`)
+
         history.push(url);
         setPage(1);
     }
 
+    useEffect(() => {
+
+        usersAPI.getPositions()
+        .then(resp => setPositions(resp));
+
+        usersAPI.getSeniorities()
+        .then(resp => setSeniorities(resp));
+
+        usersAPI.getContractTypes()
+        .then(resp => setContractTypes(resp));
+
+        usersAPI.getJobTypes()
+        .then(resp => setJobTypes(resp)); 
+        
+    }, [])
+
+    
     return (
         <div className='py-3 px-2'>
             <form onSubmit={handleFilterSubmit}>
@@ -147,9 +174,13 @@ const Filter = ({filterItems, setFilterItems, setPage}) => {
                             name="contract_type_id"
                             onChange={onFilterItemsChange}>
                                 <option value='' defaultValue>Choose</option>
-                                <option value='1'>Internship</option>
-                                <option value='2'>Labor</option>
-                                <option value='3'>Service</option>
+                                {
+                                    contractTypes?.data.map((c, index) => {
+                                        return <option 
+                                                    value={c.id}
+                                                    key={index}>{c.title}</option>
+                                    })
+                                }
                         </select>
 
                      </div>
@@ -164,8 +195,14 @@ const Filter = ({filterItems, setFilterItems, setPage}) => {
                             value={filterItems.job_type_id}
                             onChange={onFilterItemsChange}>
                                 <option value='' defaultValue>Choose</option>
-                                <option value='1'>Full-Time</option>
-                                <option value='2'>Part-Time</option>
+                                {
+                                    jobTypes?.data.map((j, index) => {
+                                        return <option 
+                                                    value={j.id} 
+                                                    key={index}>
+                                                        {j.title}</option>
+                                    })
+                                }
                         </select>
 
                      </div>
@@ -179,13 +216,14 @@ const Filter = ({filterItems, setFilterItems, setPage}) => {
                             name="seniority_id"
                             onChange={onFilterItemsChange}>
                                 <option value= "" defaultValue>Choose</option>
-                                <option value = "2"   >junior+</option>
-                                <option value = "3"   >mid</option>
-                                <option value = "4"   >mid+</option>
-                                <option value = "5"   >mid/senior</option>
-                                <option value = "6"   >senior</option>
-                                <option value = "7"   >senior+</option>
-                                <option value = "8"   >lead</option>
+                                {
+                                    seniorities?.data.map((s, index) => {
+                                        return <option 
+                                                    value={s.id} 
+                                                    key={index}>
+                                                        {s.title}</option>
+                                    })
+                                }
                         </select>
 
                      </div>
@@ -201,10 +239,11 @@ const Filter = ({filterItems, setFilterItems, setPage}) => {
                             onChange={onFilterItemsChange}>
                                 <option value='' defaultValue>Choose</option>
                                 {
-                                    positionKeys.map((p, index) => {
+                                    positions?.data.map((p, index) => {
                                         return <option 
-                                                    key={index}
-                                                    value={p}>{positions[p].value}</option>
+                                                    value={p.id} 
+                                                    key={index}>
+                                                        {p.title}</option>
                                     })
                                 }
                         </select>

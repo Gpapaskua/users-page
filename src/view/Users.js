@@ -1,6 +1,7 @@
-import axios from 'axios';
+
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router';
+import { usersAPI } from '../api/usersAPI';
 
 /**Components */
 import Pagination from '../components/common/Paginition';
@@ -40,48 +41,28 @@ const Users = () => {
     const getUsers = useCallback(
         () => {
           
-            axios.get(`https://sweeft-hrms.dznela.com/people?page=${page}${queryString.has('perPage') ? `&perPage=${queryString.get('perPage')}` : ""}${queryString.has('name') ? `&name=${queryString.get('name')}` : ''}${queryString.has('email')  ? `&email=${queryString.get('email')}` : ""}${queryString.has('doc_id')  ? `&doc_id=${queryString.get('doc_id')}` : ""}${queryString.has('phone') ? `&phone=${queryString.get('phone')}` : ""}${queryString.has('adress') ? `&adress=${queryString.get('adress')}` : ""}${queryString.has('id') ? `&id=${queryString.get('id')}` : ""}${queryString.has('status') ? `&status=${queryString.get('status')}` : ""}${queryString.has('contract_type_id') ? `&contract_type_id=${queryString.get('contract_type_id')}` : ""}${queryString.has('job_type_id') ? `&job_type_id=${queryString.get('job_type_id')}` : ""}${queryString.has('seniority_id') ? `&seniority_id=${queryString.get('seniority_id')}` : ""}${queryString.has('position_id') ? `&position_id=${queryString.get('position_id')}` : ""}`
-            )
-            .then(res => {
-                if(res.status === 200){
-                    setUsers(res.data);
-                    
-                }
+            let keys = queryString.keys();
+            let query = `?page=${page}`;
+            
+            for(let key of keys) {
+                query+=`&${key}=${queryString.get(key)}`
+            }
+            
+            usersAPI.getUsers(query)
+            .then(data => {
+                setUsers(data);
             })
+                
+           
+            
+            
         },
         [queryString, page],
     )
 
 
-    const updateFilters = useCallback(
-        () => {
-            setPage(queryString.has('page') ? parseInt(queryString.get('page')) : 1);
-       
-            setFilterItems({
-            
-            perPage: queryString.has('perPage') ? queryString.get('perPage') : 10,
-            name: queryString.has('name') ? queryString.get('name') : "",
-            email: queryString.has('email') ? queryString.get('email') : "",
-            doc_id: queryString.has('doc_id') ? queryString.get('doc_id') : "",
-            phone: queryString.has('phone') ? queryString.get('phone') : "",
-            adress: queryString.has('adress') ? queryString.get('adress') : "",
-            id: queryString.has('id') ? queryString.get('id') : "",
-            status: queryString.has('status') ? queryString.get('status') : "",
-            contract_type_id: queryString.has('contract_id') ? queryString.get('contact_id') : "",
-            job_type_id: queryString.has('job_type_id') ? queryString.get('job_type_id') : "",
-            seniority_id: queryString.has('seniority_id') ? queryString.get('seniority_id') : "",
-            position_id: queryString.has('position_id') ? queryString.get('poition_id') : ""
-            
-        });
-        },
-        [queryString],
-    )
-
-    useEffect(() => { 
-        updateFilters();
-
-    }, [updateFilters]);
-
+    
+        
 
     useEffect(() => {
       
@@ -105,17 +86,16 @@ const Users = () => {
             </div>
 
             {
-                users  ?  <UsersList users={users.data}/> : <Spinner />
+                users  ?  <UsersList users={users.data} /> : <Spinner />
             }
 
             {
             users  ?  <Pagination 
-                            filterParams={filterItems} 
+                            
                             totalItems={users.total} 
                             page={page}
                             setPage={setPage}
-                            perPage={filterItems.perPage}
-                            filterItems={filterItems}/> : null
+                            queryString={queryString}/> : null
             }
         </div>
     )

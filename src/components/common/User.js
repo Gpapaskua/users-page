@@ -1,9 +1,9 @@
 import React from 'react'
 
-/**Helpers */
-import { positions } from '../../helpers/formHelpers'
+
 
 const User = ({user}) => {
+    
     return (
         <tr>
             <td>{user.id}</td>
@@ -17,12 +17,13 @@ const User = ({user}) => {
                 <small>Department</small>
             </td>
             <td>
-                <small>{user.positions.map((p, index) => 
-                 positions[p.id] ? positions[p.id].value : "Coming Soon"
-            )}</small>
+            {user.positions.map((p, index) => 
+
+                  p.title ? <small key={index}>{p.title}</small> : "No information"
+            )}
             </td>
             <td>
-                <small>{user.role.description}</small>
+                <small>{user.role.title}</small>
             </td>
             <td>
                 <div className='pt-1'>

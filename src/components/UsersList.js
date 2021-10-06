@@ -3,8 +3,9 @@ import React from 'react'
 /**Components */
 import User from './common/User'
 
-const UsersList = ({users}) => {
+const UsersList = ({ users }) => {
 
+    
     
     return (
         <div className='container bg-white py-2 mt-5'>

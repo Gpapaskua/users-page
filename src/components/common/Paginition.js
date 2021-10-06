@@ -1,13 +1,17 @@
 import React  from 'react'
-import { useHistory } from 'react-router';
+import { useHistory, withRouter } from 'react-router';
 import { range } from './pagerRange'
 
 
-const Pagination = ({page, setPage, totalItems, perPage, filterItems}) => {
+const Pagination = ({page, setPage, totalItems, queryString}) => {
     
+    const perPage = queryString.has('perPage') ? queryString.get('perPage') : 10;
+    console.log(perPage)
     const totalPages = Math.ceil(totalItems / (perPage ? parseInt(perPage) : 10));
     const pages = page < 3 ? range(1, page + 3, page, totalPages)
     : range(page-2, page + 2, page, totalPages);
+
+    
 
     const history = useHistory();
     
@@ -38,14 +42,20 @@ const Pagination = ({page, setPage, totalItems, perPage, filterItems}) => {
 
 
         }
+
+        let keys = queryString.keys();
         
-        const url = `?page=${newPage}${filterItems.perPage.length > 0 ? `&perPage=${filterItems.perPage}` : ''}${filterItems.name.length > 0 ? `&name=${filterItems.name}` : ''}${filterItems.email.length > 0 ? `&email=${filterItems.email}` : ''}${filterItems.doc_id.length > 0 ? `&doc_id=${filterItems.doc_id}` : ''}${filterItems.phone.length > 0 ? `&phone=${filterItems.phone}` : ''}${filterItems.adress.length > 0 ? `&adress=${filterItems.adress}` : ''}${filterItems.id.length > 0 ? `&id=${filterItems.id}` : ''}${filterItems.status.length > 0 ? `&status=${filterItems.status}` : ''}${filterItems.contract_type_id.length > 0 ? `&contract_type_id=${filterItems.contract_type_id}` : ''}${filterItems.job_type_id.length > 0 ? `&job_type_id=${filterItems.job_type_id}` : ''}${filterItems.seniority_id.length > 0 ? `&seniority_id=${filterItems.seniority_id}` : ''}${filterItems.position_id.length > 0 ? `&position_id=${filterItems.position_id}` : ''}`
+        let url = `?page=${newPage}`;
+        console.log(queryString.has('page') ? '?' : `?page=${newPage}`, url)
+        for(let key of keys) {
+            console.log(queryString[key])
+            queryString.has(key) && key !== 'page' ? url+=`&${key}=${queryString.get(key)}` : url+=''
+        }
+        console.log(url)
         history.push(url);
         setPage(newPage);
-
     }
 
-    
     if(totalPages < 3){
         return null;
     } 
@@ -125,4 +135,4 @@ const Pagination = ({page, setPage, totalItems, perPage, filterItems}) => {
     )
 }
 
-export default Pagination
+export default Pagination 
